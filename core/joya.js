@@ -1,16 +1,22 @@
+const path = require("path");
+const { createRequire } = require("./moduleSystem");
 class Joya {
-  run(code) {
+  run(code, entryPath = "") {
+    console.log(`Running Joya with entry path: ${entryPath}`);
+
     const wrappedCode = `(function(exports, require, module, __filename, __dirname) { ${code} \n})`;
 
     const scriptFunction = eval(wrappedCode);
 
     const fakeModule = { exports: {} };
+    const require = createRequire(path.dirname(entryPath));
+
     scriptFunction(
-      fakeModule.exports,
+      module.exports,
       require,
-      fakeModule,
-      __filename,
-      __dirname
+      module,
+      entryPath,
+      path.dirname(entryPath)
     );
   }
 }
