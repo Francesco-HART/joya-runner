@@ -3,11 +3,12 @@ const { TimerManager } = require("./timers");
 
 class EventLoop {
   constructor() {
+    this.activeOps = 0;
     this.timer = new TimerManager();
     this.microtasks = [];
     this.tasks = [];
     this.nextId = 1;
-    this.shouldStop = false; // Flag to control the event loop execution
+    this.shouldStop = false;
   }
 
   setTimeout(callback, delay) {
@@ -15,8 +16,7 @@ class EventLoop {
   }
 
   queueMicrotask(callback) {
-    this.microtasks.push({ id: this.nextId++, callback, done: false });
-    return this.nextId - 1; // Return the ID of the microtask
+    this.microtasks.push(callback);
   }
 
   clearTimeout(id) {
@@ -32,9 +32,19 @@ class EventLoop {
     this.shouldStop = true; // Flag to stop the event loop
   }
 
+  startOp() {
+    this.activeOps++;
+  }
+
+  endOp() {
+    console.log("Ending operation, activeOps:", this.activeOps);
+    this.activeOps--;
+  }
+
   run() {
     while (
-      this.shouldStop ||
+      !this.shouldStop ||
+      this.activeOps > 0 ||
       this.timer.timers.length > 0 ||
       this.tasks.length > 0 ||
       this.microtasks.length > 0

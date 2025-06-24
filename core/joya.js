@@ -1,6 +1,7 @@
 const path = require("path");
 const { createRequire } = require("./moduleSystem");
 const { EventLoop } = require("./eventLoop");
+const { createWrappedPromise } = require("./native/promise-wrapper");
 
 class Joya {
   constructor() {
@@ -13,6 +14,7 @@ class Joya {
     const scriptFunction = eval(wrappedCode); // eval use V8 to compile the code into a function.
     const module = { exports: {} };
     globalThis.queueMicrotask = (cb) => this.loop.queueMicrotask(cb); // Global this is a reference to the global object in Node.js, which is `global`.
+    globalThis.Promise = createWrappedPromise(this.loop);
 
     const require = createRequire(path.dirname(entryPath), this);
 
@@ -25,19 +27,7 @@ class Joya {
       this
     );
 
-    // Donne à fs.readFile une chance d'ajouter une tâche
-    setTimeout(() => {
-      console.log(
-        "Joya is running with entry point:",
-        {
-          task: this.loop.tasks.length,
-          microTask: this.loop.microtasks.length,
-          timer: this.loop.timer.timers.length,
-        },
-        "tasks in queue"
-      );
-      this.loop.run();
-    }, 1000);
+    this.loop.run();
   }
 }
 
