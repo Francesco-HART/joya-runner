@@ -10,10 +10,11 @@ class Joya {
   run(code, entryPath = "") {
     const wrappedCode = `(function(exports, require, module, __filename, __dirname, joya) { ${code} \n})`;
 
-    const scriptFunction = eval(wrappedCode);
+    const scriptFunction = eval(wrappedCode); // eval use V8 to compile the code into a function.
     const module = { exports: {} };
+    globalThis.queueMicrotask = (cb) => this.loop.queueMicrotask(cb); // Global this is a reference to the global object in Node.js, which is `global`.
 
-    const require = createRequire(path.dirname(entryPath));
+    const require = createRequire(path.dirname(entryPath), this);
 
     scriptFunction(
       module.exports,
@@ -24,7 +25,19 @@ class Joya {
       this
     );
 
-    this.loop.run();
+    // Donne à fs.readFile une chance d'ajouter une tâche
+    setTimeout(() => {
+      console.log(
+        "Joya is running with entry point:",
+        {
+          task: this.loop.tasks.length,
+          microTask: this.loop.microtasks.length,
+          timer: this.loop.timer.timers.length,
+        },
+        "tasks in queue"
+      );
+      this.loop.run();
+    }, 1000);
   }
 }
 

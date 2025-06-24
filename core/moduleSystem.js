@@ -1,8 +1,14 @@
 const fs = require("fs");
 const path = require("path");
+const { createFsModule } = require("./native/fs");
 
-function createRequire(currentDir) {
+function createRequire(currentDir, joya) {
   return function require(modulePath) {
+    // Gestion des modules système
+    if (modulePath === "fs") {
+      return createFsModule(joya.loop);
+    }
+
     const resolvedPath = resolveModulePath(
       path.resolve(currentDir, modulePath)
     );
