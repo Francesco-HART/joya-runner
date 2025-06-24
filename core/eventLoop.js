@@ -23,13 +23,12 @@ class EventLoop {
     this.timer.clearTimeout(id);
   }
 
-  // Ajouter un événement immédiatement exécutable
   queueTask(callback) {
     this.tasks.push(callback);
   }
 
   exit() {
-    this.shouldStop = true; // Flag to stop the event loop
+    this.shouldStop = true;
   }
 
   startOp() {
@@ -57,8 +56,8 @@ class EventLoop {
       }
 
       while (this.microtasks.length > 0) {
-        const micro = this.microtasks.shift(); // Retire la première microtâche de la liste
-        micro(); // 👈 priorité après tasks (comme dans Node)
+        const micro = this.microtasks.shift();
+        micro();
       }
 
       this.timer.timerSleep();

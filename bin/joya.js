@@ -14,6 +14,5 @@ if (!filePath) {
 const fullPath = path.resolve(process.cwd(), filePath);
 const code = fs.readFileSync(fullPath, "utf-8");
 
-// Lancer JOYA
 const joya = new Joya();
 joya.run(code);

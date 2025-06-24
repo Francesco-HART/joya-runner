@@ -31,7 +31,7 @@ function createWrappedPromise(eventLoop) {
       return this._internal.finally(onFinally);
     }
 
-    // Pour que await continue de fonctionner
+    // To maintain compatibility with the original Promise API
     get [Symbol.toStringTag]() {
       return "Promise";
     }
