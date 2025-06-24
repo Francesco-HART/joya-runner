@@ -1,14 +1,18 @@
 const path = require("path");
 const { createRequire } = require("./moduleSystem");
-class Joya {
-  run(code, entryPath = "") {
-    console.log(`Running Joya with entry path: ${entryPath}`);
+const { EventLoop } = require("./eventLoop");
 
-    const wrappedCode = `(function(exports, require, module, __filename, __dirname) { ${code} \n})`;
+class Joya {
+  constructor() {
+    this.loop = new EventLoop();
+  }
+
+  run(code, entryPath = "") {
+    const wrappedCode = `(function(exports, require, module, __filename, __dirname, joya) { ${code} \n})`;
 
     const scriptFunction = eval(wrappedCode);
+    const module = { exports: {} };
 
-    const fakeModule = { exports: {} };
     const require = createRequire(path.dirname(entryPath));
 
     scriptFunction(
@@ -16,8 +20,11 @@ class Joya {
       require,
       module,
       entryPath,
-      path.dirname(entryPath)
+      path.dirname(entryPath),
+      this
     );
+
+    this.loop.run();
   }
 }
 

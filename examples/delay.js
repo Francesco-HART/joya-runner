@@ -1,6 +1,6 @@
-const timers = require("../core/timers");
+const { TimerManager } = require("../core/timers");
 
-const manager = new timers.TimerManager();
+const manager = new TimerManager();
 
 manager.setTimeout(() => {
   console.log("Executed after 10 second");
